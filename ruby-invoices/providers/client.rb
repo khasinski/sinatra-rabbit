@@ -10,7 +10,7 @@ class Client
     @q = @ch.queue(QUEUE_NAME)
     @x = @ch.default_exchange
 
-    @q.subscribe do |delivery_info, properties, payload|
+    @q.subscribe do |_delivery_info, properties, _payload|
       r = { clients: self.class.clients }
       @x.publish(JSON.generate(r), :routing_key => properties.reply_to, :correlation_id => properties.correlation_id)
     end

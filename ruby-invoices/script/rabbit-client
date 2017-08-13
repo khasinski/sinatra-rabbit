@@ -22,7 +22,7 @@ password = ENV["RABBIT_PASSWORD"] || 'guest'
 connection = Bunny.new("amqp://#{user}:#{password}@#{host}:#{port}")
 connection.start
 
-channel   = connection.create_channel
+channel = connection.create_channel
 x = channel.default_exchange
 
 reply_queue = channel.queue("", :exclusive => true)
@@ -33,7 +33,7 @@ response = nil
 
 call_id = "#{rand}#{rand}#{rand}"
 
-reply_queue.subscribe do |delivery_info, properties, payload|
+reply_queue.subscribe do |_delivery_info, properties, payload|
   if properties[:correlation_id] == call_id
     response = payload
     lock.synchronize{condition.signal}

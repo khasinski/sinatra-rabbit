@@ -11,4 +11,12 @@ services:
       - RABBIT_HOST=rabbitmq
     depends_on:
       - rabbitmq
+  ruby-invoices-api:
+    build: ./ruby-invoices-api
+    environment:
+      - RABBIT_HOST=rabbitmq
+    depends_on:
+      - rabbitmq
+    ports:
+      - 4567:4567
 

@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+require 'sinatra'
+require 'bunny'
+
+require_relative '../clients/rpc'
+
+host = ENV["RABBIT_HOST"] || 'localhost'
+port = ENV["RABBIT_PORT"] || 5672
+user = ENV["RABBIT_USER"] || 'guest'
+password = ENV["RABBIT_PASSWORD"] || 'guest'
+sleep 10 # give rabbitmq time to get up
+
+connection = Bunny.new "amqp://#{user}:#{password}@#{host}:#{port}"
+connection.start
+channel = connection.create_channel
+
+set :environment, :production
+
+get '/invoices.json' do
+  content_type :json
+  client = RPC.new(channel, "backend.invoices")
+  client.call(params.to_json)
+end
+
+get '/clients.json' do
+  content_type :json
+  client = RPC.new(channel, "backend.clients")
+  client.call(params.to_json)
+end

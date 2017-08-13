@@ -10,11 +10,11 @@ class Invoice
     @q = @ch.queue(QUEUE_NAME)
     @x = @ch.default_exchange
 
-    @q.subscribe do |delivery_info, properties, payload|
+    @q.subscribe do |_delivery_info, properties, payload|
       r = begin
         data = JSON.parse(payload)
 
-        invoices  = if data['client_id']
+        invoices = if data['client_id']
           self.class.invoices[data['client_id']] || []
         else
           self.class.invoices.values.flatten
@@ -24,7 +24,7 @@ class Invoice
         { error: "Can't parse the payload - send {\"client_id\": \"<desired client id>\" } as payload" }
       end
 
-      @x.publish(JSON.generate(r), :routing_key => properties.reply_to, :correlation_id => properties.correlation_id)
+      @x.publish(JSON.generate(r), routing_key: properties.reply_to, correlation_id: properties.correlation_id)
 
     end
     puts "Invoice provider started!"
